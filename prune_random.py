@@ -92,8 +92,8 @@ def main():
     global_percent = args.start_global_percent
     while True:
         seg_model_copy = copy.deepcopy(seg_model)
-        pruner = DCFPPruner(global_percent=global_percent,layer_keep=0.02, score_file=args.score_path)
-        # pruner = RandomChannelPruner(global_percent=global_percent, layer_keep=0.02)
+        # pruner = DCFPPruner(global_percent=global_percent,layer_keep=0.02, score_file=args.score_path)
+        pruner = RandomChannelPruner(global_percent=global_percent, layer_keep=0.02)
         sub_model, channel_cfg = pruner.prune_model(seg_model_copy, except_start_keys=['conv_deepsup'])
         torch.save(sub_model.state_dict(), os.path.join(args.save_path, 'pruned.pth')) 
         torch.save(channel_cfg, os.path.join(args.save_path, 'channel_cfg.pth')) 
