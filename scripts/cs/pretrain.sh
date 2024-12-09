@@ -29,7 +29,37 @@ MASTER_ADDR=${MASTER_ADDR:-"127.0.0.1"}
 PORT=${PORT:-39888}
 
 #train
-python -m torch.distributed.launch --nproc_per_node=${GPU_NUM} --master_port=$PORT --master_addr=$MASTER_ADDR train.py --dataset ${DATASET} --balance ${BALANCE} --data-para ${DATA_PARA} --model ${MODEL_NAME} --model-para ${MODEL_PARA} --backbone ${BACKBONE} --backbone-para ${BACKBONE_PARA} --loss-type ${LOSS_TYPE} --loss-para ${LOSS_PARA} --random-mirror --random-brightness --random-scale --optim ${OPTIM} --learning-rate ${LEARNING_RATE} --warmup ${WARMUP} --weight-decay ${WEIGHT_DECAY} --num-workers ${NUM_WORKERS} --num-steps ${NUM_STEPS} --input-size ${INPUT_SIZE} --align-corner ${ALIGN_CORNER} --batch-size ${BS} --random-seed 42 --snapshot-dir ${SNAPSHOT_DIR}_${MODEL_NAME} --save-pred-every ${SAVE_PRED_EVERY} --save-steps ${SAVE_STEPS} --prune-type ${PRUNE_TYPE}
+python -m torch.distributed.launch \
+    --nproc_per_node=${GPU_NUM} \
+    --master_port=$PORT \
+    --master_addr=$MASTER_ADDR \
+    train.py \
+    --dataset ${DATASET} \
+    --balance ${BALANCE} \
+    --data-para ${DATA_PARA} \
+    --model ${MODEL_NAME} \
+    --model-para ${MODEL_PARA} \
+    --backbone ${BACKBONE} \
+    --backbone-para ${BACKBONE_PARA} \
+    --loss-type ${LOSS_TYPE} \
+    --loss-para ${LOSS_PARA} \
+    --random-mirror \
+    --random-brightness \
+    --random-scale \
+    --optim ${OPTIM} \
+    --learning-rate ${LEARNING_RATE} \
+    --warmup ${WARMUP} \
+    --weight-decay ${WEIGHT_DECAY} \
+    --num-workers ${NUM_WORKERS} \
+    --num-steps ${NUM_STEPS} \
+    --input-size ${INPUT_SIZE} \
+    --align-corner ${ALIGN_CORNER} \
+    --batch-size ${BS} \
+    --random-seed 42 \
+    --snapshot-dir ${SNAPSHOT_DIR}_${MODEL_NAME} \
+    --save-pred-every ${SAVE_PRED_EVERY} \
+    --save-steps ${SAVE_STEPS} \
+    --prune-type ${PRUNE_TYPE}
 
 #ss test
 # python -m torch.distributed.launch --nproc_per_node=${GPU_NUM} evaluate.py --dataset ${DATASET} --model ${MODEL_NAME} --model-para ${MODEL_PARA} --backbone ${BACKBONE} --backbone-para ${BACKBONE_PARA} --batch-size ${TEST_BS} --whole 'True' --flip 'False' --input-size ${INPUT_SIZE} --align-corner ${ALIGN_CORNER} --ms '1' --num-workers ${NUM_WORKERS} --restore-from ${SNAPSHOT_DIR}_${MODEL_NAME}/${DATASET}_scenes_${NUM_STEPS}.pth --save-predict 'False' 
