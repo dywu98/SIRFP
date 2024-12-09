@@ -10,6 +10,7 @@ from utils.pyt_utils import load_model
 from utils.flops_counter import get_model_complexity_info
 from pruners.channel_pruner import init_pruned_model
 from pruners.dcfp_pruner import DCFPPruner
+from pruners.simi_pruner import SIMIPruner
 from pruners.random_pruner import RandomChannelPruner
 
 
@@ -76,7 +77,9 @@ def main():
         align_corner=args.align_corner,
         criterion=None,
         deepsup=False)
-    flops, params = get_model_complexity_info(seg_model, (3, 512, 512), print_per_layer_stat=False)
+    # flops, params = get_model_complexity_info(seg_model, (3, 512, 512), print_per_layer_stat=False)
+    flops, params = get_model_complexity_info(seg_model, (3,1024,2048), print_per_layer_stat=False)
+    
     flops = float(flops.split(' GFLOPs')[0])
 
     seg_model = eval('networks.'+args.model+'.Seg_Model')(
@@ -92,6 +95,7 @@ def main():
     global_percent = args.start_global_percent
     while True:
         seg_model_copy = copy.deepcopy(seg_model)
+        # pruner = SIMIPruner(global_percent=global_percent,layer_keep=0.02, score_file=args.score_path)
         pruner = DCFPPruner(global_percent=global_percent,layer_keep=0.02, score_file=args.score_path)
         # pruner = RandomChannelPruner(global_percent=global_percent, layer_keep=0.02)
         sub_model, channel_cfg = pruner.prune_model(seg_model_copy, except_start_keys=['conv_deepsup'])
@@ -110,7 +114,8 @@ def main():
         init_pruned_model(seg_model2, channel_cfg)
         load_model(seg_model2, os.path.join(args.save_path, 'pruned.pth'))
 
-        flops2, params2 = get_model_complexity_info(seg_model2, (3,512,512),print_per_layer_stat=False)
+        # flops2, params2 = get_model_complexity_info(seg_model2, (3,512,512),print_per_layer_stat=False)
+        flops2, params2 = get_model_complexity_info(seg_model2, (3,1024,2048),print_per_layer_stat=False)
         flops2 = float(flops2.split(' GFLOPs')[0])
         
         print('global_percent: {}, flops_ratio: {}'.format(global_percent, flops2/flops))

@@ -1,5 +1,7 @@
 **/__pycache__/
 **/*.pyc
-**/*.pth
+**.pth
+**/*.png
 data/
+ckpt
 **/*.txt

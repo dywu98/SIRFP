@@ -6,6 +6,8 @@ import numpy as np
 import torch
 import tensorrt as trt
 from torch2trt import torch2trt, TRTModule
+# from torch2trt_git import torch2trt
+# from torch2trt_git.torch2trt import TRTModule
 from tqdm import tqdm
 # from torchstat import stat
 
@@ -91,8 +93,9 @@ def benchmark(model, inputs, dtype='fp32', nwarmup=10, nruns=50):
 
 if __name__ == '__main__':
     parser = get_parser()
-
+    
     args = parser.parse_args()
+    print(os.path.join(args.save_dir, "trt.pth"))
     # 1 get pytorch model
     backbone_para = json.loads(args.backbone_para)
     model_para = json.loads(args.model_para)
@@ -112,6 +115,7 @@ if __name__ == '__main__':
     # # 2 conver to tensorrt model
     h, w = map(int, args.input_size.split(','))
     arr = torch.ones(1, 3, h, w).cuda()
+    print('Convert start.')
     model_trt = torch2trt(seg_model,
                           [arr],
                           fp16_mode=True,
@@ -119,7 +123,8 @@ if __name__ == '__main__':
                           max_workspace_size=(1 << 32),
                           max_batch_size=1,
                           )
-    torch.save(model_trt.state_dict(), args.save_dir)
+    
+    torch.save(model_trt.state_dict(), os.path.join(args.save_dir, "trt.pth"))
     print('Convert over.')
 
     # 3 check speedup
@@ -127,6 +132,6 @@ if __name__ == '__main__':
     inputs = torch.randn((1, 3, h, w)).to('cuda')
     # benchmark(seg_model, inputs, dtype='fp32')
 
-    model_trt = TRTModule()
-    model_trt.load_state_dict(torch.load(args.save_dir))
+    model_trt_test = TRTModule()
+    model_trt_test.load_state_dict(torch.load(os.path.join(args.save_dir, "trt.pth")))
     benchmark(model_trt, inputs, dtype='fp32')
