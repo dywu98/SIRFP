@@ -1,6 +1,7 @@
-# DCFP: Distribution Calibrated Filter Pruning for Lightweight and Accurate Long-tail Semantic Segmentation
+# SIRFP: Structural Pruning via Spatial-aware Information Redundancy for Semantic Segmentation
 
-This is a pytorch implementation for paper [DCFP](https://ieeexplore.ieee.org/abstract/document/10364745)
+This is a pytorch implementation for paper Structural Pruning via Spatial-aware Information Redundancy for Semantic Segmentation.
+This implementation is based on the [DCFP repo](https://github.com/wzx99/DCFP)
 
 ## Installation
 
@@ -32,9 +33,6 @@ Create a "data" folder. Download datasets(Cityscapes, Pascal context, ADE
   │       ├── train
   │       ├── test
   │       └── val
-  ├── CTX
-  │   ├── images
-  │   └── labels
   ├── ADEChallengeData2016
   │   ├── images
   │   │   ├── training
