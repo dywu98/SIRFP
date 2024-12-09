@@ -170,7 +170,7 @@ class SI(nn.Module):
         # value = 1/1.4142 * (torch.abs(grad_x) + torch.abs(grad_y))
         denom = value.shape[2]*value.shape[3]
         out = torch.sum(value**2, dim=(2,3))/denom - (torch.sum(value, dim=(2,3))/denom)**2
-        return out ** 0.5 # 这个东西记录的是细节多少 这个很贼
+        return out ** 0.5 # 这个东西记录的是细节多少
 
 
 def get_graph_edge_hook(self, input, output):
