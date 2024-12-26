@@ -4,7 +4,7 @@
 
 SIRFP is a tool for network pruning on semantic segmentation models. It can achieves almost lossless pruning under 60% pruning ratio.
 
-![image](https://github.com/dywu98/SIRFP/figs/pipeline.png)
+![image](https://github.com/dywu98/SIRFP/blob/main/figs/figure1.png)
 
 
 ## Installation
