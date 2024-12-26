@@ -8,9 +8,9 @@ MODEL_PARA='{}'
 BACKBONE='resnet50'
 BACKBONE_PARA='{"os":8,"mg_unit":[1,2,4],"inplanes":128}'
 ALIGN_CORNER='True'
-SAVE_DIR=ckpt/CS/dcfp_finetune_deeplabv3/trt.pth
-RESUME=ckpt/CS/dcfp_finetune_deeplabv3/CS_scenes_36000.pth
-CHANNEL_CFG=ckpt/CS/dcfp_finetune_deeplabv3/channel_cfg.pth
+SAVE_DIR=ckpt/CS/your_path/trt.pth
+RESUME=ckpt/CS/your_path/your_pth.pth
+CHANNEL_CFG=ckpt/CS/your_path/channel_cfg.pth
 
 
 python totrt.py --dataset ${DATASET} --input-size ${INPUT_SIZE} --model ${MODEL_NAME} --model-para ${MODEL_PARA} --backbone ${BACKBONE} --backbone-para ${BACKBONE_PARA} --align-corner ${ALIGN_CORNER} --restore-from ${RESUME} --channel-cfg ${CHANNEL_CFG} --save-dir ${SAVE_DIR} 

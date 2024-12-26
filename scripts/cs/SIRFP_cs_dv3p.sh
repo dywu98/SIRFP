@@ -27,7 +27,7 @@ WARMUP=-1
 NUM_STEPS=4000
 SAVE_PRED_EVERY=800
 SAVE_STEPS=$(($NUM_STEPS - `expr 3 \* ${SAVE_PRED_EVERY}`))
-SNAPSHOT_DIR=ckpt/${DATASET}/graph_edge_multi_0711resume_pretrain
+SNAPSHOT_DIR=ckpt/${DATASET}/sirfp_pretrain
 MASTER_ADDR=${MASTER_ADDR:-"127.0.0.1"}
 PORT=${PORT:-39888}
 PRUNE_METHOD='graph_edge_pruning'
@@ -77,9 +77,9 @@ BACKBONE='resnet50'
 BACKBONE_PARA='{"os":8,"mg_unit":[1,2,4],"inplanes":128}'
 ALIGN_CORNER='True'
 PRUNE_RATIO=0.3
-SNAPSHOT_DIR=ckpt/CS/graph_edge_multi_0711resume_pretrain_deeplabv3p/simi_prune_06
-RESUME_DIR=ckpt/CS/graph_edge_multi_0711resume_pretrain_deeplabv3p/CS_scenes_4000.pth
-SCORE_DIR=ckpt/CS/graph_edge_multi_0711resume_pretrain_deeplabv3p/score.pth
+SNAPSHOT_DIR=ckpt/CS/sirfp_pretrain_deeplabv3p/simi_prune_06
+RESUME_DIR=ckpt/CS/sirfp_pretrain_deeplabv3p/CS_scenes_4000.pth
+SCORE_DIR=ckpt/CS/sirfp_pretrain_deeplabv3p/score.pth
 
 python prune_graph_edge.py --dataset ${DATASET} --model ${MODEL_NAME} --model-para ${MODEL_PARA} --backbone ${BACKBONE} --backbone-para ${BACKBONE_PARA} --align-corner ${ALIGN_CORNER} --prune-ratio ${PRUNE_RATIO} --save-path ${SNAPSHOT_DIR} --model-path ${RESUME_DIR} --score-path ${SCORE_DIR} 
 
@@ -114,9 +114,9 @@ WARMUP=1000
 NUM_STEPS=8000
 SAVE_PRED_EVERY=800
 SAVE_STEPS=$(($NUM_STEPS - `expr 7 \* ${SAVE_PRED_EVERY}`))
-SNAPSHOT_DIR=ckpt/${DATASET}/graph_edge_multi_0711resume_finetune_iter1
-RESUME=ckpt/CS/graph_edge_multi_0711resume_pretrain_deeplabv3p/simi_prune_06/pruned.pth
-CHANNEL_CFG=ckpt/CS/graph_edge_multi_0711resume_pretrain_deeplabv3p/simi_prune_06/channel_cfg.pth
+SNAPSHOT_DIR=ckpt/${DATASET}/sirfp_finetune_iter1
+RESUME=ckpt/CS/sirfp_pretrain_deeplabv3p/simi_prune_06/pruned.pth
+CHANNEL_CFG=ckpt/CS/sirfp_pretrain_deeplabv3p/simi_prune_06/channel_cfg.pth
 MASTER_ADDR=${MASTER_ADDR:-"127.0.0.1"}
 PORT=${PORT:-29888}
 
@@ -144,10 +144,10 @@ BACKBONE='resnet50'
 BACKBONE_PARA='{"os":8,"mg_unit":[1,2,4],"inplanes":128}'
 ALIGN_CORNER='True'
 PRUNE_RATIO=0.6
-SNAPSHOT_DIR=ckpt/CS/graph_edge_multi_0711resume_finetune_iter1_deeplabv3p/simi_prune_06
-RESUME_DIR=ckpt/CS/graph_edge_multi_0711resume_finetune_iter1_deeplabv3p/CS_scenes_${NUM_STEPS}.pth
-SCORE_DIR=ckpt/CS/graph_edge_multi_0711resume_finetune_iter1_deeplabv3p/score.pth
-CHANNEL_CFG=ckpt/CS/graph_edge_multi_0711resume_pretrain_deeplabv3p/simi_prune_06/channel_cfg.pth
+SNAPSHOT_DIR=ckpt/CS/sirfp_finetune_iter1_deeplabv3p/simi_prune_06
+RESUME_DIR=ckpt/CS/sirfp_finetune_iter1_deeplabv3p/CS_scenes_${NUM_STEPS}.pth
+SCORE_DIR=ckpt/CS/sirfp_finetune_iter1_deeplabv3p/score.pth
+CHANNEL_CFG=ckpt/CS/sirfp_pretrain_deeplabv3p/simi_prune_06/channel_cfg.pth
 
 python prune_graph_edge_multi.py --dataset ${DATASET} --model ${MODEL_NAME} --model-para ${MODEL_PARA} --backbone ${BACKBONE} --backbone-para ${BACKBONE_PARA} --align-corner ${ALIGN_CORNER} --prune-ratio ${PRUNE_RATIO} --save-path ${SNAPSHOT_DIR} --model-path ${RESUME_DIR} --score-path ${SCORE_DIR} --channelcfg-path ${CHANNEL_CFG}
 
@@ -187,9 +187,9 @@ WARMUP=1000
 NUM_STEPS=36000
 SAVE_PRED_EVERY=800
 SAVE_STEPS=$(($NUM_STEPS - `expr 7 \* ${SAVE_PRED_EVERY}`))
-SNAPSHOT_DIR=ckpt/${DATASET}/graph_edge_multi_0711resume_finetune_iter2
-RESUME=ckpt/CS/graph_edge_multi_0711resume_finetune_iter1_deeplabv3p/simi_prune_06/pruned.pth
-CHANNEL_CFG=ckpt/CS/graph_edge_multi_0711resume_finetune_iter1_deeplabv3p/simi_prune_06/channel_cfg.pth
+SNAPSHOT_DIR=ckpt/${DATASET}/sirfp_finetune_iter2
+RESUME=ckpt/CS/sirfp_finetune_iter1_deeplabv3p/simi_prune_06/pruned.pth
+CHANNEL_CFG=ckpt/CS/sirfp_finetune_iter1_deeplabv3p/simi_prune_06/channel_cfg.pth
 MASTER_ADDR=${MASTER_ADDR:-"127.0.0.1"}
 PORT=${PORT:-29888}
 
