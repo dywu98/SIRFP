@@ -10,7 +10,8 @@ from utils.pyt_utils import load_model
 from utils.flops_counter import get_model_complexity_info
 from pruners.channel_pruner import init_pruned_model
 from pruners.dcfp_pruner import DCFPPruner
-from pruners.simi_pruner import SIMIPruner
+from pruners.simi_pruner import SIMI2Pruner
+from pruners.graph_pruner import GraphPruner, GraphEdgePruner, GraphEdgeV2Pruner
 from pruners.random_pruner import RandomChannelPruner
 
 
@@ -33,6 +34,7 @@ def get_parser():
     parser.add_argument("--save-path", type=str, default='./ckpt')
     parser.add_argument("--model-path", type=str, default='')
     parser.add_argument("--score-path", type=str, default='')
+    parser.add_argument("--channelcfg-path", type=str, default='')
     
     parser.add_argument("--prune-ratio", type=float, default=0.6)
     parser.add_argument("--start_global_percent", type=float, default=0.5)
@@ -88,12 +90,17 @@ def main():
                     align_corner=args.align_corner,
                     criterion=None,
                     deepsup=True)
+    before_channel_cfg = torch.load(os.path.join(args.channelcfg_path,))
+    init_pruned_model(seg_model, before_channel_cfg)
     load_model(seg_model, args.model_path)
     
     global_percent = args.start_global_percent
     while True:
         seg_model_copy = copy.deepcopy(seg_model)
-        pruner = SIMIPruner(global_percent=global_percent,layer_keep=0.02, score_file=args.score_path)
+        # pruner = SIMI2Pruner(global_percent=global_percent,layer_keep=0.02, score_file=args.score_path)
+        # pruner = GraphEdgePruner(global_percent=global_percent,layer_keep=0.02, score_file=args.score_path)
+        pruner = GraphEdgeV2Pruner(global_percent=global_percent,layer_keep=0.02, score_file=args.score_path)
+        
         # pruner = DCFPPruner(global_percent=global_percent,layer_keep=0.02, score_file=args.score_path)
         # pruner = RandomChannelPruner(global_percent=global_percent, layer_keep=0.02)
         sub_model, channel_cfg = pruner.prune_model(seg_model_copy, except_start_keys=['conv_deepsup'])
