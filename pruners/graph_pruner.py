@@ -175,3 +175,77 @@ class GraphEdgePruner(ChannelPruner):
             pruned = pruned + channels - remain
             # print('layer {} \t total channel: {} \t remaining channel: {}'.format(conv_layer, channels, remain))
             total += channels
+
+
+class graph_edgev2_pruning(graph_edge_pruning):
+    def __init__(self, model, r=0.99, **kwards):
+        self.r = r
+        self.state_dict = {'eic':{}, 'edge':{}, 'grad':{}}
+        for m in model.named_modules():
+            if (isinstance(m[1], nn.BatchNorm2d) or isinstance(m[1], nn.SyncBatchNorm) or isinstance(m[1], nn.LayerNorm)) and not m[0] in model.ignore_prune_layer:
+                self.state_dict['eic'][m[0]] = 0
+                self.state_dict['edge'][m[0]] = 0
+                self.state_dict['grad'][m[0]] = 0.
+                m[1].register_forward_hook(get_graph_edge_hook)
+
+    def step(self, model):
+        for m in model.named_modules():
+            if m[0] in self.state_dict['eic']:
+                # flag = (m[1].weight.grad.data * m[1].weight.data > 0)
+                # grad_tmp = flag*torch.abs(m[1].weight.grad.data.detach())+ torch.logical_not(flag)*self.state_dict['eic'][m[0]]
+                self.state_dict['eic'][m[0]] = self.state_dict['eic'][m[0]]*self.r + m[1].ci*(1-self.r)
+                self.state_dict['edge'][m[0]] = self.state_dict['edge'][m[0]]*self.r + m[1].edge*(1-self.r)
+                flag = (m[1].weight.grad.data * m[1].weight.data > 0)
+                grad_tmp = flag * (torch.abs(m[1].weight.grad.data.detach()).to(device=flag.device))
+                grad_tmp += torch.logical_not(flag) * self.state_dict['grad'][m[0]]
+                self.state_dict['grad'][m[0]] = self.state_dict['grad'][m[0]]*self.r + grad_tmp.to(device=flag.device)*(1-self.r)
+              
+
+class GraphEdgeV2Pruner(GraphEdgePruner):
+    def __init__(self, global_percent=0.8, layer_keep=0.01, except_start_keys=['head.fc'], score_file='', **kwards):
+        super(GraphEdgePruner, self).__init__(except_start_keys=except_start_keys)
+        self.layer_keep = layer_keep
+        self.global_percent = global_percent
+        self.eic = torch.load(score_file,map_location='cpu')['eic']
+        self.edge = torch.load(score_file,map_location='cpu')['edge']
+        self.grad = torch.load(score_file,map_location='cpu')['grad']
+        
+    def get_para_score(self, bn_layer):
+        # score = self.eic[bn_layer].mean(dim=0)
+        simi_matrix = deepcopy(self.eic[bn_layer]) # 这个应该是CxC形状的
+        channel_num = simi_matrix.shape[0]
+        if 'backbone' in bn_layer:
+            score = 0.4 * self.grad[bn_layer]
+            # print("larger than 35")
+            # print(bn_layer)
+        else:
+            score = 0.4 * self.grad[bn_layer]# for ade
+        # if 'backbone' in bn_layer:
+        #     score = 0.4 * self.edge[bn_layer]
+        #     # print("larger than 35")
+        #     # print(bn_layer)
+        # else:
+        #     # score = 0.4 * self.grad[bn_layer]# for ade 0726 46.8
+        #     score = self.grad[bn_layer]# for ade
+            
+        
+        
+        left_index_simi_matrix = set(range(channel_num))
+        for i in range(channel_num):
+            current_score = torch.sum(-(simi_matrix.abs()),dim=1)
+            # 这里就已经转化成了redundancy取反，就是不相似度 越像越负
+            value, index = torch.sort(current_score, descending=False) # 升序排序，就是跟别人最相似的排在前面
+            p = 0
+            # value_delete = value[0]
+            # index_delete = index[0]
+            while int(index[p]) not in left_index_simi_matrix:
+                p += 1
+            index_delete = int(index[p])
+            score[index_delete] += value[p]
+            # 这个就已经被删掉了 下一次的simi_matrix里面就不应该有这个了
+            # 所以这些地方就都置为0
+            simi_matrix[index_delete] *=  0.0
+            simi_matrix[:,index_delete] *= 0.0
+            left_index_simi_matrix -= {index_delete}
+            
+        return score
