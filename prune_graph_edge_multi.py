@@ -10,8 +10,7 @@ from utils.pyt_utils import load_model
 from utils.flops_counter import get_model_complexity_info
 from pruners.channel_pruner import init_pruned_model
 from pruners.dcfp_pruner import DCFPPruner
-from pruners.simi_pruner import SIMI2Pruner
-from pruners.graph_pruner import GraphPruner, GraphEdgePruner, GraphEdgeV2Pruner
+from pruners.graph_pruner import GraphEdgePruner, GraphEdgeV2Pruner
 from pruners.random_pruner import RandomChannelPruner
 
 
@@ -97,7 +96,6 @@ def main():
     global_percent = args.start_global_percent
     while True:
         seg_model_copy = copy.deepcopy(seg_model)
-        # pruner = SIMI2Pruner(global_percent=global_percent,layer_keep=0.02, score_file=args.score_path)
         # pruner = GraphEdgePruner(global_percent=global_percent,layer_keep=0.02, score_file=args.score_path)
         pruner = GraphEdgeV2Pruner(global_percent=global_percent,layer_keep=0.02, score_file=args.score_path)
         
